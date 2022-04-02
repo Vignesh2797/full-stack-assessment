@@ -1,9 +1,12 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from "react";
+import ReactDOM from "react-dom";
+import Content from "./components/Content/Content";
+import Header from "./components/Header/Header";
 
 ReactDOM.render(
-  <React.StrictMode>
-    <div></div>
-  </React.StrictMode>,
-  document.getElementById('root')
+  <>
+    <Header />
+    <Content />
+  </>,
+  document.getElementById("root")
 );

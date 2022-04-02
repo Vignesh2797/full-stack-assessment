@@ -1,0 +1,8 @@
+.header {
+  background-color: #9c27b0 !important;
+}
+
+.header__title {
+  display: flex;
+  justify-content: center;
+}
