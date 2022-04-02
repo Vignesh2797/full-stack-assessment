@@ -40,9 +40,24 @@ run().catch(console.dir);
 
 client.close();
 
+let patientsData = []
 
-app.get("/api", (req, res) => {
-    res.json({ message: "Hello World!!!!" });
+async function getData() {
+    await client.connect();
+    const db = client.db(dbName);
+    const col = db.collection(colName)
+
+    col.find().toArray(function (err, result) {
+        if (err) throw err;
+        patientsData = result
+        client.close();
+    })
+}
+
+getData();
+
+app.get("/records", (req, res) => {
+    res.json({ records: patientsData })
 });
 
 app.listen(PORT, () => {
