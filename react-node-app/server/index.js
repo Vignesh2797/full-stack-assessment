@@ -9,12 +9,11 @@ const app = express();
 const cors = require('cors');
 const url = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.dpcwz.mongodb.net/test?retryWrites=true&w=majority`;
 const client = new MongoClient(url);
-const dbName = "test";
+const dbName = "sample";
 const colName = "records";
 
 app.use(cors());
 app.use(express.json())
-
 
 async function run() {
     try {
@@ -23,41 +22,43 @@ async function run() {
         const db = client.db(dbName);
         const col = db.collection(colName)
 
-        dir.readFiles(`${process.env.DB_DATAPATH}`, async function (err, content, filename, next) {
-            if (err) throw err;
-            const dataBuffer = fs.readFileSync(filename)
-            const dataJSON = dataBuffer.toString();
-            const data = JSON.parse(dataJSON)
-            const p = await col.insertOne(data);
-            next();
+        col.count((err, count) => {
+            if (!err & count === 0) {
+                dir.readFiles(`${process.env.DB_DATAPATH}`, async function (err, content, filename, next) {
+                    if (err) throw err;
+                    const dataBuffer = fs.readFileSync(filename)
+                    const dataJSON = dataBuffer.toString();
+                    const data = JSON.parse(dataJSON)
+                    const p = await col.insertOne(data);
+                    next();
+                })
+            }
         })
+
+
 
     } catch (err) {
         console.log(err.stack);
     }
 }
-run().catch(console.dir);
+run()
 
 client.close();
 
-let patientsData = []
 
-async function getData() {
+
+app.get("/records", async (req, res) => {
     await client.connect();
     const db = client.db(dbName);
     const col = db.collection(colName)
 
-    col.find().toArray(function (err, result) {
-        if (err) throw err;
-        patientsData = result
+    col.find({}).toArray((err, result) => {
+        if (err) return res.status(500).send(error);;
+        res.send(result);
         client.close();
     })
-}
 
-getData();
 
-app.get("/records", (req, res) => {
-    res.json({ records: patientsData })
 });
 
 app.listen(PORT, () => {
