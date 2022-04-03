@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import Card from "@mui/material/Card";
 import CircularProgress from "@mui/material/CircularProgress";
+import ErrorIcon from "@mui/icons-material/Error";
 import CardContent from "@mui/material/CardContent";
-import PatientModel  from '../../interfaces/patient';
+import PatientModel from "../../interfaces/patient";
 
 import "./Content.css";
 import { showAddress } from "../../utils/constants";
@@ -12,7 +13,8 @@ import { showMobile } from "../../utils/constants";
 
 const Content = () => {
   const [data, setData] = useState([]);
-  const [isLoaded, setLoaded] = useState<boolean>(false);
+  const [isLoaded, setLoaded] = useState<boolean>(true);
+  const [err, setError] = useState<boolean>(false);
 
   const columns = [
     { field: "name", headerName: "Name", width: 400 },
@@ -22,7 +24,7 @@ const Content = () => {
     { field: "mobile", headerName: "Mobile", width: 200 },
   ];
 
-  let patientData: PatientModel[] = []
+  let patientData: PatientModel[] = [];
 
   data.forEach((element: any) => {
     const obj = {
@@ -42,32 +44,47 @@ const Content = () => {
   useEffect(() => {
     fetch("http://localhost:3001/records")
       .then((res) => res.json())
-      .then((res) => {
-        setLoaded(true);
-        setData(res);
-      });
+      .then(
+        (res) => {
+          setLoaded(false);
+          setData(res);
+        },
+        (err) => {
+          setError(true);
+        }
+      );
   }, []);
 
-  return isLoaded ? (
-    <>
-      <Card>
-        <CardContent>
-          <div style={{ height: 700, width: "100%" }}>
-            <DataGrid disableSelectionOnClick 
-              rows={rows}
-              columns={columns}
-              pageSize={10}
-              rowsPerPageOptions={[10]}
-            />
-          </div>
-        </CardContent>
-      </Card>
-    </>
+  return !err ? (
+    !isLoaded ? (
+      <>
+        <Card>
+          <CardContent>
+            <div style={{ height: 700, width: "100%" }}>
+              <DataGrid
+                disableSelectionOnClick
+                rows={rows}
+                columns={columns}
+                pageSize={10}
+                rowsPerPageOptions={[10]}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </>
+    ) : (
+      <>
+        <div className="loader">
+          <CircularProgress sx={{ color: '#9c27b0' }} />
+          <h5>Loading....</h5>
+        </div>
+      </>
+    )
   ) : (
     <>
-      <div className="loader">
-        <CircularProgress color="primary" />
-        <h5>Loading....</h5>
+      <div className="error">
+        <ErrorIcon sx={{ color: '#9c27b0' }} className="error__icon"/>
+        <h3 className="error__message">Server Error!!!!</h3>
       </div>
     </>
   );
