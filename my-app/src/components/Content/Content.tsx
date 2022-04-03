@@ -6,6 +6,9 @@ import CardContent from "@mui/material/CardContent";
 import PatientModel  from '../../interfaces/patient';
 
 import "./Content.css";
+import { showAddress } from "../../utils/constants";
+import { showName } from "../../utils/constants";
+import { showMobile } from "../../utils/constants";
 
 const Content = () => {
   const [data, setData] = useState([]);
@@ -21,24 +24,7 @@ const Content = () => {
 
   let patientData: PatientModel[] = []
 
-  const showAddress = (ele: any) => {
-    const address = ele[0].line[0] + " " + ele[0].city + " " + ele[0].state;
-    return address;
-  };
-
-  const showName = (ele: any) => {
-    const firstName = ele[0].given[0].replace(/[0-9]/g, "");
-    const lastName = ele[0].family.replace(/[0-9]/g, "");
-    const name = firstName + " " + lastName;
-    return name;
-  };
-
-  const showMobile = (ele: any) => {
-    const mobile = ele[0].value;
-    return mobile;
-  };
-
-  data.map((element: any) => {
+  data.forEach((element: any) => {
     const obj = {
       id: element.entry[0].resource.id,
       name: showName(element.entry[0].resource.name),
@@ -49,8 +35,6 @@ const Content = () => {
     };
 
     patientData.push(obj);
-
-    return 
   });
 
   const rows = patientData;
