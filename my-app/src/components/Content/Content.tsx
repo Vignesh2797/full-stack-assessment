@@ -60,9 +60,9 @@ const Content = () => {
       .then((res) => res.json())
       .then((res) => {
         setLoaded(true);
-        setData(res.records);
+        setData(res);
       });
-  }, [data]);
+  }, []);
 
   return isLoaded ? (
     <>
